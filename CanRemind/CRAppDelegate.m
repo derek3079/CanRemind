@@ -7,14 +7,55 @@
 //
 
 #import "CRAppDelegate.h"
+#import "CRViewController.h"
+#import <AudioToolbox/AudioToolbox.h>
 
 @implementation CRAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
+    
+    UILocalNotification *locationNotification = [launchOptions objectForKey:UIApplicationLaunchOptionsLocalNotificationKey];
+    if (locationNotification) {
+        // Set icon badge number to zero
+    }
+    
     return YES;
 }
+
+-(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification{
+    
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"An Alert" message:notification.alertBody delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alertView show];
+    
+    application.applicationIconBadgeNumber  = 0;
+    
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    
+    application.applicationIconBadgeNumber = 0;
+
+    if ([application respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+        [application registerUserNotificationSettings:
+         [UIUserNotificationSettings settingsForTypes:(UIRemoteNotificationTypeBadge |
+                                                       UIRemoteNotificationTypeSound |
+                                                       UIRemoteNotificationTypeAlert)
+                                           categories:nil]];
+        
+        [application registerForRemoteNotifications];
+        
+    } else {
+        
+        [application registerForRemoteNotificationTypes:(UIRemoteNotificationType)
+         (UIRemoteNotificationTypeBadge |
+          UIRemoteNotificationTypeSound |
+          UIRemoteNotificationTypeAlert)];
+        
+    }
+    
+}
+
 							
 - (void)applicationWillResignActive:(UIApplication *)application
 {
@@ -33,10 +74,7 @@
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application
-{
-    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-}
+
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
